@@ -1,176 +1,185 @@
+package main
 
-	// Returns a JSON response with status code 200 and all albums data
-	func test_getAlbums_ReturnsAllAlbumsData(t *testing.T) {
-		// Initialize a new HTTP request to the /albums endpoint
-		req, _ := http.NewRequest("GET", "/albums", nil)
+import (
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 
-		// Create a response recorder to record the response
-		rr := httptest.NewRecorder()
+	"github.com/gin-gonic/gin"
+)
 
-		// Create a new router instance
-		router := gin.Default()
-		router.GET("/albums", getAlbums)
+// Returns a JSON response with status code 200 and all albums data
+func test_getAlbums_ReturnsAllAlbumsData(t *testing.T) {
+	// Initialize a new HTTP request to the /albums endpoint
+	req, _ := http.NewRequest("GET", "/albums", nil)
 
-		// Serve the HTTP request to the response recorder
-		router.ServeHTTP(rr, req)
+	// Create a response recorder to record the response
+	rr := httptest.NewRecorder()
 
-		// Check if the status code is 200
-		if rr.Code != http.StatusOK {
-			t.Errorf("Expected status code %d, but got %d", http.StatusOK, rr.Code)
-		}
+	// Create a new router instance
+	router := gin.Default()
+	router.GET("/albums", getAlbums)
 
-		// Check if the response body contains all albums data
-		expectedResponse := `[{"id":"1","title":"Blue Train","artist":"John Coltrane","price":56.99},{"id":"2","title":"Jeru","artist":"Gerry Mulligan","price":17.99},{"id":"3","title":"Sarah Vaughan and Clifford Brown","artist":"Sarah Vaughan","price":39.99}]`
-		if rr.Body.String() != expectedResponse {
-			t.Errorf("Expected response body %s, but got %s", expectedResponse, rr.Body.String())
-		}
+	// Serve the HTTP request to the response recorder
+	router.ServeHTTP(rr, req)
+
+	// Check if the status code is 200
+	if rr.Code != http.StatusOK {
+		t.Errorf("Expected status code %d, but got %d", http.StatusOK, rr.Code)
 	}
 
-	// Returns a JSON response with status code 200 and an empty array when there are no albums
-	func test_getAlbums_ReturnsEmptyArrayWhenNoAlbums(t *testing.T) {
-		// Initialize a new HTTP request to the /albums endpoint
-		req, _ := http.NewRequest("GET", "/albums", nil)
+	// Check if the response body contains all albums data
+	expectedResponse := `[{"id":"1","title":"Blue Train","artist":"John Coltrane","price":56.99},{"id":"2","title":"Jeru","artist":"Gerry Mulligan","price":17.99},{"id":"3","title":"Sarah Vaughan and Clifford Brown","artist":"Sarah Vaughan","price":39.99}]`
+	if rr.Body.String() != expectedResponse {
+		t.Errorf("Expected response body %s, but got %s", expectedResponse, rr.Body.String())
+	}
+}
 
-		// Create a response recorder to record the response
-		rr := httptest.NewRecorder()
+// Returns a JSON response with status code 200 and an empty array when there are no albums
+func test_getAlbums_ReturnsEmptyArrayWhenNoAlbums(t *testing.T) {
+	// Initialize a new HTTP request to the /albums endpoint
+	req, _ := http.NewRequest("GET", "/albums", nil)
 
-		// Create a new router instance with an empty albums slice
-		router := gin.Default()
-		router.GET("/albums", func(c *gin.Context) {
-			c.IndentedJSON(http.StatusOK, []album{})
-		})
+	// Create a response recorder to record the response
+	rr := httptest.NewRecorder()
 
-		// Serve the HTTP request to the response recorder
-		router.ServeHTTP(rr, req)
+	// Create a new router instance with an empty albums slice
+	router := gin.Default()
+	router.GET("/albums", func(c *gin.Context) {
+		c.IndentedJSON(http.StatusOK, []album{})
+	})
 
-		// Check if the status code is 200
-		if rr.Code != http.StatusOK {
-			t.Errorf("Expected status code %d, but got %d", http.StatusOK, rr.Code)
-		}
+	// Serve the HTTP request to the response recorder
+	router.ServeHTTP(rr, req)
 
-		// Check if the response body is an empty array
-		expectedResponse := `[]`
-		if rr.Body.String() != expectedResponse {
-			t.Errorf("Expected response body %s, but got %s", expectedResponse, rr.Body.String())
-		}
+	// Check if the status code is 200
+	if rr.Code != http.StatusOK {
+		t.Errorf("Expected status code %d, but got %d", http.StatusOK, rr.Code)
 	}
 
-	// Returns a JSON response with status code 404 and an error message when the requested resource is not found
-	func test_getAlbums_Returns404WhenResourceNotFound(t *testing.T) {
-		// Initialize a new HTTP request to a non-existent endpoint
-		req, _ := http.NewRequest("GET", "/nonexistent", nil)
+	// Check if the response body is an empty array
+	expectedResponse := `[]`
+	if rr.Body.String() != expectedResponse {
+		t.Errorf("Expected response body %s, but got %s", expectedResponse, rr.Body.String())
+	}
+}
 
-		// Create a response recorder to record the response
-		rr := httptest.NewRecorder()
+// Returns a JSON response with status code 404 and an error message when the requested resource is not found
+func test_getAlbums_Returns404WhenResourceNotFound(t *testing.T) {
+	// Initialize a new HTTP request to a non-existent endpoint
+	req, _ := http.NewRequest("GET", "/nonexistent", nil)
 
-		// Create a new router instance
-		router := gin.Default()
-		router.GET("/albums", getAlbums)
+	// Create a response recorder to record the response
+	rr := httptest.NewRecorder()
 
-		// Serve the HTTP request to the response recorder
-		router.ServeHTTP(rr, req)
+	// Create a new router instance
+	router := gin.Default()
+	router.GET("/albums", getAlbums)
 
-		// Check if the status code is 404
-		if rr.Code != http.StatusNotFound {
-			t.Errorf("Expected status code %d, but got %d", http.StatusNotFound, rr.Code)
-		}
+	// Serve the HTTP request to the response recorder
+	router.ServeHTTP(rr, req)
 
-		// Check if the response body contains the error message
-		expectedResponse := `404 page not found`
-		if rr.Body.String() != expectedResponse {
-			t.Errorf("Expected response body %s, but got %s", expectedResponse, rr.Body.String())
-		}
+	// Check if the status code is 404
+	if rr.Code != http.StatusNotFound {
+		t.Errorf("Expected status code %d, but got %d", http.StatusNotFound, rr.Code)
 	}
 
-	// Returns a JSON response with status code 500 and an error message when there is an internal server error
-	func test_getAlbums_Returns500WhenInternalServerError(t *testing.T) {
-		// Initialize a new HTTP request to the /albums endpoint
-		req, _ := http.NewRequest("GET", "/albums", nil)
+	// Check if the response body contains the error message
+	expectedResponse := `404 page not found`
+	if rr.Body.String() != expectedResponse {
+		t.Errorf("Expected response body %s, but got %s", expectedResponse, rr.Body.String())
+	}
+}
 
-		// Create a response recorder to record the response
-		rr := httptest.NewRecorder()
+// Returns a JSON response with status code 500 and an error message when there is an internal server error
+func test_getAlbums_Returns500WhenInternalServerError(t *testing.T) {
+	// Initialize a new HTTP request to the /albums endpoint
+	req, _ := http.NewRequest("GET", "/albums", nil)
 
-		// Create a new router instance with a faulty handler function
-		router := gin.Default()
-		router.GET("/albums", func(c *gin.Context) {
-			// Simulate an internal server error by causing a panic
-			panic("Internal Server Error")
-		})
+	// Create a response recorder to record the response
+	rr := httptest.NewRecorder()
 
-		// Serve the HTTP request to the response recorder
-		router.ServeHTTP(rr, req)
+	// Create a new router instance with a faulty handler function
+	router := gin.Default()
+	router.GET("/albums", func(c *gin.Context) {
+		// Simulate an internal server error by causing a panic
+		panic("Internal Server Error")
+	})
 
-		// Check if the status code is 500
-		if rr.Code != http.StatusInternalServerError {
-			t.Errorf("Expected status code %d, but got %d", http.StatusInternalServerError, rr.Code)
-		}
+	// Serve the HTTP request to the response recorder
+	router.ServeHTTP(rr, req)
 
-		// Check if the response body contains the error message
-		expectedResponse := `Internal Server Error`
-		if rr.Body.String() != expectedResponse {
-			t.Errorf("Expected response body %s, but got %s", expectedResponse, rr.Body.String())
-		}
+	// Check if the status code is 500
+	if rr.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status code %d, but got %d", http.StatusInternalServerError, rr.Code)
 	}
 
-	// The order of the albums in the response is the same as in the 'albums' variable
-	func test_getAlbums_ReturnsAlbumsInCorrectOrder(t *testing.T) {
-		// Initialize a new HTTP request to the /albums endpoint
-		req, _ := http.NewRequest("GET", "/albums", nil)
+	// Check if the response body contains the error message
+	expectedResponse := `Internal Server Error`
+	if rr.Body.String() != expectedResponse {
+		t.Errorf("Expected response body %s, but got %s", expectedResponse, rr.Body.String())
+	}
+}
 
-		// Create a response recorder to record the response
-		rr := httptest.NewRecorder()
+// The order of the albums in the response is the same as in the 'albums' variable
+func test_getAlbums_ReturnsAlbumsInCorrectOrder(t *testing.T) {
+	// Initialize a new HTTP request to the /albums endpoint
+	req, _ := http.NewRequest("GET", "/albums", nil)
 
-		// Create a new router instance
-		router := gin.Default()
-		router.GET("/albums", getAlbums)
+	// Create a response recorder to record the response
+	rr := httptest.NewRecorder()
 
-		// Serve the HTTP request to the response recorder
-		router.ServeHTTP(rr, req)
+	// Create a new router instance
+	router := gin.Default()
+	router.GET("/albums", getAlbums)
 
-		// Check if the status code is 200
-		if rr.Code != http.StatusOK {
-			t.Errorf("Expected status code %d, but got %d", http.StatusOK, rr.Code)
-		}
+	// Serve the HTTP request to the response recorder
+	router.ServeHTTP(rr, req)
 
-		// Check if the response body contains albums in correct order
-		expectedResponse := `[{"id":"1","title":"Blue Train","artist":"John Coltrane","price":56.99},{"id":"2","title":"Jeru","artist":"Gerry Mulligan","price":17.99},{"id":"3","title":"Sarah Vaughan and Clifford Brown","artist":"Sarah Vaughan","price":39.99}]`
-		if rr.Body.String() != expectedResponse {
-			t.Errorf("Expected response body %s, but got %s", expectedResponse, rr.Body.String())
-		}
+	// Check if the status code is 200
+	if rr.Code != http.StatusOK {
+		t.Errorf("Expected status code %d, but got %d", http.StatusOK, rr.Code)
 	}
 
-	// The response JSON has the correct format and keys for each album object
-	func test_getAlbums_ReturnsResponseWithCorrectFormatAndKeys(t *testing.T) {
-		// Initialize a new HTTP request to the /albums endpoint
-		req, _ := http.NewRequest("GET", "/albums", nil)
+	// Check if the response body contains albums in correct order
+	expectedResponse := `[{"id":"1","title":"Blue Train","artist":"John Coltrane","price":56.99},{"id":"2","title":"Jeru","artist":"Gerry Mulligan","price":17.99},{"id":"3","title":"Sarah Vaughan and Clifford Brown","artist":"Sarah Vaughan","price":39.99}]`
+	if rr.Body.String() != expectedResponse {
+		t.Errorf("Expected response body %s, but got %s", expectedResponse, rr.Body.String())
+	}
+}
 
-		// Create a response recorder to record the response
-		rr := httptest.NewRecorder()
+// The response JSON has the correct format and keys for each album object
+func test_getAlbums_ReturnsResponseWithCorrectFormatAndKeys(t *testing.T) {
+	// Initialize a new HTTP request to the /albums endpoint
+	req, _ := http.NewRequest("GET", "/albums", nil)
 
-		// Create a new router instance
-		router := gin.Default()
-		router.GET("/albums", getAlbums)
+	// Create a response recorder to record the response
+	rr := httptest.NewRecorder()
 
-		// Serve the HTTP request to the response recorder
-		router.ServeHTTP(rr, req)
+	// Create a new router instance
+	router := gin.Default()
+	router.GET("/albums", getAlbums)
 
-		// Check if the status code is 200
-		if rr.Code != http.StatusOK {
-			t.Errorf("Expected status code %d, but got %d", http.StatusOK, rr.Code)
-		}
+	// Serve the HTTP request to the response recorder
+	router.ServeHTTP(rr, req)
 
-		// Check if the response body has the correct format and keys
-		expectedResponse := `[{"id":"1","title":"Blue Train","artist":"John Coltrane","price":56.99},{"id":"2","title":"Jeru","artist":"Gerry Mulligan","price":17.99},{"id":"3","title":"Sarah Vaughan and Clifford Brown","artist":"Sarah Vaughan","price":39.99}]`
-		var response []album
-		err := json.Unmarshal(rr.Body.Bytes(), &response)
-		if err != nil {
-			t.Errorf("Failed to unmarshal response body: %s", err.Error())
-		}
+	// Check if the status code is 200
+	if rr.Code != http.StatusOK {
+		t.Errorf("Expected status code %d, but got %d", http.StatusOK, rr.Code)
+	}
 
-		for i, album := range response {
-			if album.ID != albums[i].ID || album.Title != albums[i].Title || album.Artist != albums[i].Artist || album.Price != albums[i].Price {
-				t.Errorf("Expected album %v, but got %v", albums[i], album)
-			}
+	// Check if the response body has the correct format and keys
+	expectedResponse := `[{"id":"1","title":"Blue Train","artist":"John Coltrane","price":56.99},{"id":"2","title":"Jeru","artist":"Gerry Mulligan","price":17.99},{"id":"3","title":"Sarah Vaughan and Clifford Brown","artist":"Sarah Vaughan","price":39.99}]`
+	var response []album
+	err := json.Unmarshal(rr.Body.Bytes(), &response)
+	if err != nil {
+		t.Errorf("Failed to unmarshal response body: %s", err.Error())
+	}
+
+	for i, album := range response {
+		if album.ID != albums[i].ID || album.Title != albums[i].Title || album.Artist != albums[i].Artist || album.Price != albums[i].Price {
+			t.Errorf("Expected album %v, but got %v", albums[i], album)
 		}
 	}
-	
+}
